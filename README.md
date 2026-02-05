@@ -1,5 +1,6 @@
 
 Create Project 
+
 I. Navigate to: Automation Execution → Projects → Create Project.
 
 II. Fill in the details
@@ -38,6 +39,27 @@ II. Create "Agent for RAN" Template
    | Project         | MyProject                            |
    | Playbook        | playbooks/ran_agent.yml      |
    | Credentials     | AAP,Demo Credential                                            |
-   | Extra variables | llama_stack_url: llamastack-server-llama-serve.apps.cluster-w8px7.w8px7.sandbox1697.opentlc.com
-full_anomaly_report: '{{ full_anomaly_report }}'  |
+   | Extra variables | llama_stack_url: llamastack-server-llama-serve.apps.cluster-w8px7.w8px7.sandbox1697.opentlc.com full_anomaly_report: '{{ full_anomaly_report }}'  |
 
+III. Create "Get Lightspeed Prompt" Template
+
+   | Parameter       | Value                                |
+   |-----------------|--------------------------------------|
+   | Name            | Get Lightspeed Prompt         |
+   | Inventory       | Demo Inventory                       |
+   | Project         | MyProject                            |
+   | Playbook        | playbooks/aap_create_job_template.yml      |
+   | Credentials     | AAP                                          |
+
+IV. Create "Send Report to Slack" Template
+ | Parameter       | Value                                |
+   |-----------------|--------------------------------------|
+   | Name            | Send Report to Slack       |
+   | Inventory       | Demo Inventory                       |
+   | Project         | MyProject                            |
+   | Playbook        | playbooks/slack_ran.yml      |
+   | Credentials     | AAP                                          |
+
+
+
+   Create "RAN Antenna Configuration Workflow" Workflow Template
