@@ -1,0 +1,49 @@
+---
+- name: Send logs to Slack on HTTP failure
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    slack_token: ""
+
+  tasks:
+    - name: Fail if required variables are not set
+      ansible.builtin.fail:
+        msg: "Slack Instance must be set!"
+      when: slack_token | default('') | trim == ''
+
+
+    - name: Send error notification message via Slack
+      community.general.slack:
+        token: "{{ slack_token }}"
+        attachments:
+          - text: "!!!!!! ALERT !!!!!!"
+            color: "#ff00dd"
+            title: "Anomaly Detected"
+            fields:
+              - title: Issue
+                value: "Anomaly Detected"
+                short: true
+              - title: Details
+                value: "{{ full_anomaly_report }}"
+                short: true
+      
+
+    - name: Send RCA insights from RHEL AI to Mattermost
+      community.general.slack:
+        token: "{{ slack_token }}"
+        attachments:
+          - text: "!!!!!! RCA INSIGHT !!!!!!"
+            color: "#ffa500"
+            title: "Root Cause Identified"
+            fields:
+              - title: RCA of Anomaly 
+                value: "AI-Generated Explanation"
+                short: true
+              - title: Details
+                value: "{{ gpt_response | default('No RCA available') }}"
+                short: true
+      
+     
+
+    

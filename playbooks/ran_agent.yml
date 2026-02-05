@@ -1,0 +1,106 @@
+---
+- name: Agent → Session → LLM Turn (Python streaming)
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - name: Create agent for RCA
+      uri:
+        url: "https://{{ llama_stack_url }}/v1/agents"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          Accept: "application/json"
+        body_format: json
+        body:
+          agent_config:
+            sampling_params:
+              strategy:
+                type: "greedy"
+              max_tokens: 512
+            model: "granite-8b-lab-v1"
+            instructions: >
+              \n###Based on the logs:
+
+              1. Extract the API endpoint from the log.
+              2. Extract all JSON parameters from the log (e.g., cell_id, anomaly_type, anomaly_value, threshold_value, action, azimuth_change, downtilt_change).
+              3. Output only one single-line fix instruction in the following exact format:
+
+              Make a POST request to <endpoint> with JSON key-value payload where keys and values are <key1>: <value1>, <key2>: <value2>, ...
+
+              4. Replace <endpoint> and all key-value pairs with the extracted values.
+              5. Do not output any additional text, explanations, or formatting.
+                      
+        return_content: yes
+        validate_certs: no
+      register: agent_response
+
+    - name: Create session
+      uri:
+        url: "https://{{ llama_stack_url }}/v1/agents/{{ agent_response.json.agent_id }}/session"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          Accept: "application/json"
+        body: '{"session_name": "string"}'
+        body_format: json
+        return_content: yes
+        validate_certs: no
+      register: session_response
+
+    - name: Create turn
+      uri:
+        url: "https://{{ llama_stack_url }}/v1/agents/{{ agent_response.json.agent_id }}/session/{{ session_response.json.session_id }}/turn"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+          Accept: "application/json"
+        body_format: json
+        body:
+          messages:
+            - role: "user"
+              content: "{{ full_anomaly_report | default('What is the capital of the USA?') }}"
+              # Only keep "context" if the Llama Stack API specifically requires it; 
+              # otherwise, it's safer to omit it if it's just a placeholder "string".
+              context: "string" 
+          stream: true
+          tool_config:
+            tool_choice: "auto"
+        return_content: yes
+        validate_certs: no
+      register: turn_response_gpt
+
+    - name: Display Turn response
+      ansible.builtin.debug:
+        msg: "{{ turn_response_gpt.content }}"
+
+    - name: Extract JSON string from turn_response_gpt.content
+      ansible.builtin.set_fact:
+       json_string: "{{ turn_response_gpt.content | regex_replace('^data:\\s*', '') }}"
+
+    - name: Parse JSON
+      ansible.builtin.set_fact:
+        json_clean: >-
+          {{ json_string[ json_string.find('{') : json_string.rfind('}') + 1 ] }}
+
+
+    - name: Extract last JSON object from json_clean
+      set_fact:
+        last_json: "{{ json_clean | regex_findall('({.*})') | last }}"
+        
+
+    - name: Extract GPT Response
+      ansible.builtin.set_fact:
+        gpt_response: "{{ last_json.event.payload.turn.output_message.content }}"
+
+    - name: Display GPT Response
+      ansible.builtin.debug:
+        msg: "{{ gpt_response }}"
+
+    - name: Set stats for next controller job
+      ansible.builtin.set_stats:
+        data:
+          gpt_response: "{{ gpt_response }}"
+
+
+   
