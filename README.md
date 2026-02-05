@@ -1,5 +1,6 @@
+# Optimizing RAN operations with OpenShift AI and Remediation using Ansible Automation Platform
 
-### Create Projects
+## Create Projects
 
 I. Navigate to: Automation Execution → Projects → Create Project.
 
@@ -68,8 +69,52 @@ V. Create "RAN Antenna Configuration Workflow" Workflow Template
 
    ![Visual](images/ai-ran-workflow.png)
 
+## Configure Apache Kafka Container
 
-### Configure Event Driven Ansible
+I. Create "Setup Kafka" Template
+
+   | Parameter       | Value                                |
+   |-----------------|--------------------------------------|
+   | Name            | Setup Kafka                |
+   | Inventory       | service-inventory                      |
+   | Project         | MyProject                            |
+   | Playbook        | playbooks/kafka.yml      |
+   | Credentials     | AAP,lab-credential                                            |
+   | Extra variables | kafka_external_hostname: service1.pchzg.sandbox2169.opentlc.com   |
+
+   ### The kafka_external_hostname is similar to the Mattermost External Hostname except the https and port
+
+II. Run the Setup Kafka template
+
+III. log on to bastion or mac and test endpoint using:
+    
+       nc -vz service1.pchzg.sandbox2169.opentlc.com 9092
+
+IV. log on the service1 host and exec into cp-kafka pod
+    
+    podman exec -it cp-kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server service1:9092 --topic ai-ran-logs --from-beginning
+
+V. On mac enter test messages using below command
+    
+    podman run --rm -it \
+        --platform linux/arm64 \
+        confluentinc/cp-kafka:7.6.0 \
+        /usr/bin/kafka-console-producer \
+        --broker-list service1.pchzg.sandbox2169.opentlc.com:9092 \
+        --topic ai-ran-logs
+
+VI. check entry on mac
+   
+      podman run --rm -it \
+        --platform linux/arm64 \
+        confluentinc/cp-kafka:7.6.0 \
+        /usr/bin/kafka-console-consumer \
+        --bootstrap-server service1.pchzg.sandbox2169.opentlc.com:9092 \
+        --topic ai-ran-logs \
+        --from-beginning
+
+     
+## Configure Event Driven Ansible
 
 I. Create Project for Event Driven Ansible
    Navigate to: Automation Decision → Projects → Create Project.
