@@ -67,4 +67,4 @@ IV. Create "Send Report to Slack" Template
 
    Create "RAN Antenna Configuration Workflow" Workflow Template
 
-   ![Visual](../images/ai-ran-workflow.png)
+   ![Visual](images/ai-ran-workflow.png)
