@@ -38,8 +38,11 @@ II. Create "Agent for RAN" Template
    | Inventory       | Demo Inventory                       |
    | Project         | MyProject                            |
    | Playbook        | playbooks/ran_agent.yml      |
-   | Credentials     | AAP,Demo Credential                                            |
+   | Credentials     | AAP,Demo Credential      |
    | Extra variables | llama_stack_url: llamastack-server-llama-serve.apps.cluster-w8px7.w8px7.sandbox1697.opentlc.com full_anomaly_report: '{{ full_anomaly_report }}'  |
+
+#### Select Prompt on Launch Checkbox.
+   
 
 III. Create "Get Lightspeed Prompt" Template
 
@@ -63,3 +66,5 @@ IV. Create "Send Report to Slack" Template
 
 
    Create "RAN Antenna Configuration Workflow" Workflow Template
+
+   ![Visual](../images/ai-ran-workflow.png)
