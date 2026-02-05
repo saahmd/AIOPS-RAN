@@ -1,5 +1,5 @@
 
-Create Project 
+### Create Projects
 
 I. Navigate to: Automation Execution → Projects → Create Project.
 
@@ -17,7 +17,7 @@ III. Save and verify that **MyProject** status is **Success**.
 
 
 
-Job Templates
+### Create Job Templates
 
 I. Create "Print Anomaly" Template
 
@@ -62,9 +62,37 @@ IV. Create "Send Report to Slack" Template
    | Project         | MyProject                            |
    | Playbook        | playbooks/slack_ran.yml      |
    | Credentials     | AAP                                          |
+   
 
-
-
-   Create "RAN Antenna Configuration Workflow" Workflow Template
+V. Create "RAN Antenna Configuration Workflow" Workflow Template
 
    ![Visual](images/ai-ran-workflow.png)
+
+
+### Configure Event Driven Ansible
+
+I. Create Project for Event Driven Ansible
+   Navigate to: Automation Decision → Projects → Create Project.
+
+ii. Fill in the details:
+
+| Parameter             | Value                                               |
+   |-----------------------|-----------------------------------------------------|
+   | Name                  | mwc-project                                  |
+   | Organization          | Default                                             |
+   | Source Control Type   | Git                                                 |
+   | Source Control URL    | https://github.com/saahmd/LLamaonOpenshift.git      |
+
+
+### Create Rulebook Activation
+
+I. Create "ai-ran" Rulebook
+
+   | Parameter       | Value                                |
+   |-----------------|--------------------------------------|
+   | Name            | ai-ran                 |
+   | Inventory       | Demo Inventory                       |
+   | Project         | mwc-project                            |
+   | Playbook        | ai_ran.yml      |
+   | Credentials     | AAP                                           |
+
