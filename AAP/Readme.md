@@ -1,5 +1,3 @@
-# Optimizing RAN operations with OpenShift AI and Remediation using Ansible Automation Platform
-
 ## Steps to configure Ansible Automation Platform
 
 This demo is based out on a catalog item available on RHDP
